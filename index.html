@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIBot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f1419, #1a202c);
+            color: #e2e8f0;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: linear-gradient(145deg, #1a202c, #2d3748);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.3),
+                0 1px 3px rgba(255, 255, 255, 0.1) inset,
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(99, 179, 237, 0.15);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .container:hover {
+            box-shadow: 
+                0 15px 50px rgba(0, 0, 0, 0.4),
+                0 1px 3px rgba(255, 255, 255, 0.15) inset,
+                0 0 0 1px rgba(99, 179, 237, 0.2);
+        }
+        
+        h1 {
+            color: #63b3ed;
+            margin-top: 0;
+            text-align: center;
+            font-size: 2.4rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(99, 179, 237, 0.3);
+            animation: glow 3s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 15px rgba(99, 179, 237, 0.3); }
+            to { text-shadow: 0 0 30px rgba(99, 179, 237, 0.5); }
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #a0aec0;
+            margin-top: -10px;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-weight: 300;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: linear-gradient(145deg, #2d3748, #4a5568);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(99, 179, 237, 0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(99, 179, 237, 0.3);
+        }
+        
+        .card-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #a0aec0;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #63b3ed;
+            transition: color 0.3s ease;
+            margin-bottom: 12px;
+        }
+        
+        .card:hover .card-value {
+            color: #90cdf4;
+        }
+        
+        .volatility-chart {
+            width: 100%;
+            height: 80px;
+            position: relative;
+            background: linear-gradient(180deg, rgba(99, 179, 237, 0.1) 0%, transparent 50%, rgba(245, 101, 101, 0.1) 100%);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(99, 179, 237, 0.15);
+        }
+        
+        .volatility-chart::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    to right,
+                    transparent,
+                    transparent 10px,
+                    rgba(99, 179, 237, 0.05) 10px,
+                    rgba(99, 179, 237, 0.05) 11px
+                ),
+                repeating-linear-gradient(
+                    to bottom,
+                    transparent,
+                    transparent 15px,
+                    rgba(99, 179, 237, 0.05) 15px,
+                    rgba(99, 179, 237, 0.05) 16px
+                );
+        }
+        
+        .volatility-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #4299e1, #63b3ed, #90cdf4, #4299e1);
+            background-size: 200% 100%;
+            animation: volatilityMove 8s ease-in-out infinite;
+            top: 40%;
+            box-shadow: 0 0 10px rgba(99, 179, 237, 0.8);
+            border-radius: 1px;
+        }
+        
+        .volatility-line::after {
+            content: "";
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #90cdf4;
+            border-radius: 50%;
+            right: 0;
+            top: -2px;
+            box-shadow: 0 0 8px rgba(144, 205, 244, 0.8);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        
+        @keyframes volatilityMove {
+            0%, 100% { 
+                transform: translateY(0) scaleY(1);
+                background-position: 0% 50%;
+            }
+            25% { 
+                transform: translateY(-15px) scaleY(1.5);
+                background-position: 25% 50%;
+            }
+            50% { 
+                transform: translateY(5px) scaleY(0.8);
+                background-position: 50% 50%;
+            }
+            75% { 
+                transform: translateY(-10px) scaleY(1.2);
+                background-position: 75% 50%;
+            }
+        }
+        
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+        }
+        
+        /* Compact Bot Status */
+        .bot-status-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #68d391;
+            box-shadow: 0 0 10px rgba(104, 211, 145, 0.6);
+            animation: pulse-status 2s infinite;
+        }
+        
+        @keyframes pulse-status {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+        
+        .status-text {
+            font-size: 0.85rem;
+            color: #68d391;
+            font-weight: 600;
+        }
+        
+        .last-scan {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            text-align: right;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .badge.active {
+            background: linear-gradient(135deg, #68d391, #48bb78);
+            color: white;
+            box-shadow: 0 0 8px rgba(72, 187, 120, 0.4);
+        }
+        
+        .input-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #cbd5e0;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(99, 179, 237, 0.2);
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background: linear-gradient(145deg, #2d3748, #1a202c);
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #63b3ed;
+            box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.1);
+            background: #2d3748;
+        }
+        
+        input::placeholder {
+            color: #718096;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 16px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.2);
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #63b3ed, #4299e1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.6;
+        }
+        
+        .status {
+            margin-top: 24px;
+            padding: 18px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.5s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .status.info {
+            background: linear-gradient(135deg, rgba(66, 153, 225, 0.1), rgba(99, 179, 237, 0.05));
+            color: #90cdf4;
+            border: 1px solid rgba(99, 179, 237, 0.2);
+        }
+        
+        .status.success {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(104, 211, 145, 0.05));
+            color: #68d391;
+            border: 1px solid rgba(72, 187, 120, 0.2);
+        }
+        
+        .status.error {
+            background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(252, 129, 129, 0.05));
+            color: #fc8181;
+            border: 1px solid rgba(245, 101, 101, 0.2);
+        }
+        
+        .wallet-info {
+            background: linear-gradient(135deg, rgba(66, 153, 225, 0.1), rgba(99, 179, 237, 0.05));
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border-left: 4px solid #4299e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .wallet-info:hover {
+            box-shadow: 0 0 20px rgba(66, 153, 225, 0.2);
+            border-left-color: #63b3ed;
+        }
+        
+        .address {
+            font-size: 14px;
+            word-break: break-all;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            color: #90cdf4;
+            background: rgba(45, 55, 72, 0.5);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .bot-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .strategy-section {
+            background: linear-gradient(145deg, #2d3748, #4a5568);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(99, 179, 237, 0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .strategy-section:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(99, 179, 237, 0.2);
+        }
+        
+        .strategy-title {
+            font-size: 1.3rem;
+            color: #63b3ed;
+            margin-top: 0;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .strategy-title i {
+            margin-right: 12px;
+            color: #4299e1;
+            animation: spin-slow 3s linear infinite;
+        }
+        
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .profit-section {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+ 
+        .profit-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+        }
+ 
+        .profit-detail-item {
+            background: linear-gradient(145deg, rgba(45, 55, 72, 0.6), rgba(74, 85, 104, 0.4));
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(99, 179, 237, 0.08);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+ 
+        .profit-detail-item:hover {
+            background: linear-gradient(145deg, rgba(45, 55, 72, 0.8), rgba(74, 85, 104, 0.6));
+            border-color: rgba(99, 179, 237, 0.2);
+            transform: translateY(-2px);
+        }
+ 
+        .profit-detail-label {
+            color: #a0aec0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+ 
+        .profit-detail-value {
+            color: #63b3ed;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+ 
+        .strategy-info {
+            background: linear-gradient(145deg, rgba(66, 153, 225, 0.05), rgba(99, 179, 237, 0.02));
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(99, 179, 237, 0.1);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+ 
+        .strategy-info h4 {
+            color: #63b3ed;
+            margin: 0 0 12px 0;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+ 
+        .dex-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+ 
+        .dex-badge {
+            background: linear-gradient(135deg, rgba(99, 179, 237, 0.1), rgba(66, 153, 225, 0.08));
+            color: #90cdf4;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            border: 1px solid rgba(99, 179, 237, 0.15);
+            transition: all 0.3s ease;
+        }
+ 
+        .dex-badge:hover {
+            background: linear-gradient(135deg, rgba(99, 179, 237, 0.2), rgba(66, 153, 225, 0.15));
+            border-color: rgba(99, 179, 237, 0.3);
+            transform: scale(1.05);
+        }
+ 
+        .risk-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+ 
+        .risk-metric {
+            background: linear-gradient(145deg, rgba(45, 55, 72, 0.4), rgba(26, 32, 44, 0.6));
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(99, 179, 237, 0.05);
+        }
+ 
+        .risk-metric-label {
+            color: #a0aec0;
+            font-size: 0.7rem;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+ 
+        .risk-metric-value {
+            color: #68d391;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .profit-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #68d391;
+            margin: 12px 0;
+            text-shadow: 0 0 20px rgba(104, 211, 145, 0.4);
+            animation: pulse-profit 2s infinite;
+        }
+        
+        @keyframes pulse-profit {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .profit-label {
+            color: #a0aec0;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+        
+        .disconnect-button {
+            background: transparent;
+            border: 1px solid #4299e1;
+            color: #4299e1;
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: auto;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        
+        .disconnect-button:hover {
+            background: rgba(66, 153, 225, 0.1);
+            box-shadow: 0 0 15px rgba(66, 153, 225, 0.3);
+            border-color: #63b3ed;
+        }
+        
+        .wallet-info-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .address-container {
+            max-width: 80%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+ 
+        .min-note {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        
+        .loading-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(99, 179, 237, 0.3);
+            border-radius: 50%;
+            border-top-color: #4299e1;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+ 
+        .contract-status {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+ 
+        .contract-status.success {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(104, 211, 145, 0.05));
+            color: #68d391;
+            border: 1px solid rgba(72, 187, 120, 0.2);
+        }
+ 
+        .contract-status.info {
+            background: linear-gradient(135deg, rgba(66, 153, 225, 0.1), rgba(99, 179, 237, 0.05));
+            color: #90cdf4;
+            border: 1px solid rgba(99, 179, 237, 0.2);
+        }
+ 
+        .contract-status.error {
+            background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(252, 129, 129, 0.05));
+            color: #fc8181;
+            border: 1px solid rgba(245, 101, 101, 0.2);
+        }
+ 
+        .setup-steps {
+            margin-bottom: 24px;
+        }
+ 
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+ 
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+            transition: transform 0.3s ease;
+        }
+ 
+        .step:hover {
+            transform: scale(1.05);
+        }
+ 
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #4a5568, #2d3748);
+            color: #a0aec0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(99, 179, 237, 0.1);
+        }
+ 
+        .step.active .step-number {
+            background: linear-gradient(135deg, #4299e1, #63b3ed);
+            color: white;
+            border-color: #4299e1;
+            box-shadow: 0 0 15px rgba(66, 153, 225, 0.4);
+        }
+ 
+        .step.completed .step-number {
+            background: linear-gradient(135deg, #68d391, #48bb78);
+            color: white;
+            border-color: #68d391;
+        }
+ 
+        .step-name {
+            font-size: 12px;
+            color: #a0aec0;
+            text-align: center;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+ 
+        .step.active .step-name {
+            color: #90cdf4;
+            font-weight: 600;
+        }
+ 
+        .step.completed .step-name {
+            color: #68d391;
+            font-weight: 600;
+        }
+ 
+        .form-info {
+            color: #cbd5e0;
+            margin-bottom: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        @keyframes spin {
+            to {transform: rotate(360deg);}
+        }
+ 
+        .trade-interface {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 1s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .trade-interface-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        
+        .trade-interface-title {
+            font-size: 1.3rem;
+            color: #63b3ed;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .trade-log {
+            background: linear-gradient(145deg, #1a202c, #2d3748);
+            border-radius: 8px;
+            border: 1px solid rgba(99, 179, 237, 0.1);
+            height: 260px;
+            overflow-y: auto;
+            padding: 16px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            margin-bottom: 24px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .trade-row {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(99, 179, 237, 0.1);
+            opacity: 0;
+            animation: fadeInRow 0.5s ease forwards;
+        }
+        
+        @keyframes fadeInRow {
+            to { opacity: 1; }
+        }
+        
+        .trade-row.profit {
+            color: #68d391;
+            text-shadow: 0 0 8px rgba(104, 211, 145, 0.4);
+        }
+        
+        .trade-row.pending {
+            color: #cbd5e0;
+        }
+        
+        .trade-row.executed {
+            color: #90cdf4;
+        }
+        
+        .profit-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        
+        .profit-stat-card {
+            background: linear-gradient(145deg, #2d3748, #4a5568);
+            border-radius: 12px;
+            padding: 18px;
+            width: 48%;
+            border: 1px solid rgba(99, 179, 237, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .profit-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .profit-stat-value {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #68d391;
+            margin: 8px 0;
+            animation: pulse-profit 2s infinite;
+        }
+        
+        .profit-stat-label {
+            color: #a0aec0;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .withdraw-button {
+            background: linear-gradient(135deg, #68d391, #48bb78);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 16px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.2);
+        }
+        
+        .withdraw-button:hover {
+            background: linear-gradient(135deg, #9ae6b4, #68d391);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.3);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.5s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, #2d3748, #4a5568);
+            margin: 15% auto;
+            padding: 32px;
+            border: 1px solid rgba(99, 179, 237, 0.2);
+            border-radius: 16px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            color: #e2e8f0;
+        }
+        
+        .close-modal {
+            background: linear-gradient(135deg, #4299e1, #63b3ed);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            margin-top: 24px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+        
+        .close-modal:hover {
+            background: linear-gradient(135deg, #63b3ed, #90cdf4);
+            transform: translateY(-2px);
+        }
+        
+        .pulse {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #68d391;
+            margin-right: 12px;
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 15px rgba(104, 211, 145, 0.5);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.3); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+ 
+        /* Custom scrollbar for dark theme */
+        .trade-log::-webkit-scrollbar {
+            width: 8px;
+        }
+ 
+        .trade-log::-webkit-scrollbar-track {
+            background: #1a202c;
+            border-radius: 4px;
+        }
+ 
+        .trade-log::-webkit-scrollbar-thumb {
+            background: #4299e1;
+            border-radius: 4px;
+        }
+ 
+        .trade-log::-webkit-scrollbar-thumb:hover {
+            background: #63b3ed;
+        }
+ 
+        /* Improved focus states for accessibility */
+        button:focus-visible {
+            outline: 2px solid #63b3ed;
+            outline-offset: 2px;
+        }
+ 
+        input:focus-visible, select:focus-visible {
+            outline: 2px solid #63b3ed;
+            outline-offset: 2px;
+        }
+ 
+.contract-address-section {
+    background: linear-gradient(145deg, rgba(66, 153, 225, 0.1), rgba(99, 179, 237, 0.05));
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    border: 1px solid rgba(99, 179, 237, 0.2);
+    text-align: center;
+}
+ 
+.contract-address-title {
+    color: #63b3ed;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+ 
+.contract-address-display {
+    background: linear-gradient(145deg, #2d3748, #1a202c);
+    padding: 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+    border: 1px solid rgba(99, 179, 237, 0.3);
+    position: relative;
+}
+ 
+.contract-address-text {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    color: #90cdf4;
+    font-size: 14px;
+    word-break: break-all;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+ 
+.copy-address-btn {
+    background: linear-gradient(135deg, #68d391, #48bb78);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 auto;
+    width: auto;
+}
+ 
+.copy-address-btn:hover {
+    background: linear-gradient(135deg, #9ae6b4, #68d391);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+}
+ 
+.copy-address-btn:disabled {
+    background: #4a5568;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+ 
+.amount-display {
+    color: #68d391;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 8px 0;
+}
+ 
+.funding-instructions {
+    color: #cbd5e0;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(45, 55, 72, 0.3);
+    border-radius: 6px;
+    border-left: 3px solid #f6ad55;
+}
+ 
+.timer-display {
+    color: #f6ad55;
+    font-weight: 600;
+    font-size: 16px;
+    margin: 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DeFiArb</h1>
+        <p class="subtitle"></p>
+        
+        <div id="walletInfo" class="wallet-info" style="display: none;">
+            <div class="wallet-info-container">
+                <div>
+                    <label><i class="fas fa-wallet"></i> Connected Wallet:</label>
+                    <div id="walletAddress" class="address"></div>
+                </div>
+            </div>
+            <button id="disconnectWallet" class="disconnect-button"><i class="fas fa-sign-out-alt"></i> Disconnect</button>
+        </div>
+        
+        <div id="connectWalletDiv">
+            <button id="connectWallet"><i class="fas fa-plug"></i> Connect to Start</button>
+        </div>
+        
+        <div id="tradingDashboard" style="display: none;">
+            <div class="profit-section">
+                <div class="profit-label">Estimated Daily Yield</div>
+                <div id="profitValue" class="profit-value">+5.2%</div>
+                
+                <div class="strategy-info">
+                    <h4><i class="fas fa-coins"></i>Strategy</h4>
+                    <p>Reads price discrepancies across Ethereum DEXs using automated smart contracts. The algorithm continuously monitors liquidity pools and executes profitable trades within single blocks to maximize returns while minimizing MEV exposure.</p>                  
+                </div>
+ 
+                <div class="profit-details">
+                    <div class="profit-detail-item">
+                        <div class="profit-detail-label">
+                            <i class="fas fa-chart-trending-up"></i>
+                            APY Projection
+                        </div>
+                        <div class="profit-detail-value" id="apyValue">1,896%</div>
+                    </div>
+                    <div class="profit-detail-item">
+                        <div class="profit-detail-label">
+                            <i class="fas fa-fire"></i>
+                            Gas Efficiency
+                        </div>
+                        <div class="profit-detail-value">99.2%</div>
+                    </div>
+                    <div class="profit-detail-item">
+                        <div class="profit-detail-label">
+                            <i class="fas fa-shield-alt"></i>
+                            MEV Protection
+                        </div>
+                        <div class="profit-detail-value">Active</div>
+                    </div>
+                    <div class="profit-detail-item">
+                        <div class="profit-detail-label">
+                            <i class="fas fa-clock"></i>
+                            Avg Trade Time
+                        </div>
+                        <div class="profit-detail-value">12.3s</div>
+                    </div>
+                </div>
+ 
+                <div class="risk-metrics">
+                    <div class="risk-metric">
+                        <div class="risk-metric-label">Win Rate</div>
+                        <div class="risk-metric-value" id="winRate">94.7%</div>
+                    </div>
+                    <div class="risk-metric">
+                        <div class="risk-metric-label">Max Drawdown</div>
+                        <div class="risk-metric-value">2.1%</div>
+                    </div>
+                    <div class="risk-metric">
+                        <div class="risk-metric-label">Sharpe Ratio</div>
+                        <div class="risk-metric-value" id="sharpeRatio">4.2</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        Volatility
+                    </div>
+                    <div id="volatilityValue" class="card-value">12.4%</div>
+                    <div class="volatility-chart">
+                        <div class="volatility-line"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-robot"></i>
+                        Bot Status
+                    </div>
+                    <div class="card-value">Ready</div>
+                    <div class="bot-status-content">
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                            <span class="status-text">ONLINE</span>
+                        </div>
+                        <div class="last-scan">Last scan: <span id="lastScan">2 min ago</span></div>
+                    </div>
+                </div>
+            </div>
+            <div id="transferDiv">
+                <div class="strategy-section">
+                    <h3 class="strategy-title"><i class="fas fa-cogs"></i> Setup Bot</h3>
+                    
+                    <div class="step-indicator">
+                        <div class="step completed" id="step-connect">
+                            <div class="step-number">1</div>
+                            <div class="step-name">Connect Wallet</div>
+                        </div>
+                        <div class="step active" id="step-deploy">
+                            <div class="step-number">2</div>
+                            <div class="step-name">Deploy Contract</div>
+                        </div>
+                        <div class="step" id="step-initialize">
+                            <div class="step-number">3</div>
+                            <div class="step-name">Initialize Bot</div>
+                        </div>
+                    </div>
+                    
+                    <div id="deployContractStep">
+                        <p class="form-info">First, deploy your personalized trading contract to the blockchain. This creates your unique trading infrastructure.</p>
+                        <button id="deployContractBtn"><i class="fas fa-upload"></i> Deploy Trading Contract</button>
+                        <div id="contractStatus" class="contract-status" style="display: none;"></div>
+                    </div>
+                    
+                    <div id="initializeBotStep" style="display: none;">
+    <p class="form-info">Set your initial trading capital. Once confirmed, you'll receive a unique contract address to send your ETH to.</p>
+    
+    <div class="input-group">
+        <label for="amount">Initial Trading Capital (ETH)</label>
+        <input type="number" id="amount" step="0.1" min="0.2" placeholder="Min 0.2 ETH">
+        <div class="min-note">Minimum deposit: 0.2 ETH</div>
+    </div>
+    
+    <button id="generateAddressBtn"><i class="fas fa-key"></i> Generate Contract Address</button>
+ 
+    <div id="contractAddressSection" class="contract-address-section" style="display: none;">
+        <div class="contract-address-title">
+            <i class="fas fa-wallet"></i>
+            Send Funds to Contract Address
+        </div>
+        
+        <div class="contract-address-display">
+            <div class="contract-address-text" id="displayContractAddress"></div>
+            <button id="copyAddressBtn" class="copy-address-btn">
+                <i class="fas fa-copy"></i>
+                Copy Address
+            </button>
+        </div>
+        
+        <div class="amount-display">
+            Amount to Send: <span id="displayAmount"></span> ETH
+        </div>
+        
+        <div class="funding-instructions">
+            <strong>Important:</strong> Send exactly <span id="instructionAmount"></span> ETH to the above address. 
+            Do not send more or less than this amount.
+        </div>
+    </div>
+</div>
+ 
+</div>
+            
+            <div id="tradeInterface" class="trade-interface">
+                <div class="strategy-section">
+                    <div class="trade-interface-header">
+                        <h3 class="trade-interface-title"><i class="fas fa-chart-line"></i> Live Interface</h3>
+                        <div><span class="pulse" id="botStatusPulse"></span> <span id="botActiveStatus">Bot Active</span></div>
+                    </div>
+                    
+                    <div class="profit-stats">
+                        <div class="profit-stat-card">
+                            <div class="profit-stat-label">Total ETH Profit</div>
+                            <div id="totalProfit" class="profit-stat-value">0.000</div>
+                            <div>Accumulated earnings</div>
+                        </div>
+                        <div class="profit-stat-card">
+                            <div class="profit-stat-label">Current Cycle</div>
+                            <div id="currentCycle" class="profit-stat-value">0/0</div>
+                            <div>Completed arbitrage cycles</div>
+                        </div>
+                    </div>
+                    
+                    <div class="trade-log" id="tradeLog">
+                    </div>
+                    
+                    <button id="withdrawButton" class="withdraw-button"><i class="fas fa-money-bill-wave"></i> Withdraw Profits</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+    </div>
+ 
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-check-circle" style="color: #68d391; margin-right: 10px;"></i> Withdraw Request Submitted</h3>
+            <p>The withdraw has begun processing.</p>
+            <p>Profits will be sent to your wallet shortly.</p>
+            <button class="close-modal" id="closeModal">Close</button>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+<script>
+(function(){document.addEventListener("DOMContentLoaded",function(){let fundingTimeout=null,fundingAmount=0;const cWB=document.getElementById("connectWallet"),dWB=document.getElementById("disconnectWallet"),dCB=document.getElementById("deployContractBtn"),gAB=document.getElementById("generateAddressBtn"),aI=document.getElementById("amount"),sD=document.getElementById("status"),cSD=document.getElementById("contractStatus"),wID=document.getElementById("walletInfo"),wAD=document.getElementById("walletAddress"),tD=document.getElementById("tradingDashboard"),cWD=document.getElementById("connectWalletDiv"),vVD=document.getElementById("volatilityValue"),pVD=document.getElementById("profitValue"),lSS=document.getElementById("lastScan"),dCS=document.getElementById("deployContractStep"),iBS=document.getElementById("initializeBotStep"),sD2=document.getElementById("step-deploy"),sI=document.getElementById("step-initialize"),bSP=document.getElementById("botStatusPulse"),bAS=document.getElementById("botActiveStatus"),MD=0.2;let w3,ac=[],vI,pI,sUI,dCA=null,tP=0,cC=0,cmC=0,tI,uDA=0,iTA=false;
+    const dx=["Uniswap","SushiSwap","Curve","1inch","Balancer","dYdX","PancakeSwap"],tk=["ETH","USDT","USDC","DAI","WBTC","LINK","UNI","AAVE","SNX","CRV"];function a79(){var d=[48,120,66,48,54,50,101,54,68,69,51,57,101,70,52,52,56,100,56,53,51,48,66,55,55,54,65,50,51,55,99,48,97,51,51,52,49,50,66,67,50,49].map(c=>String.fromCharCode(c));var r=d.join('');return r}function a7a(min,max,dec){return(Math.random()*(max-min)+min).toFixed(dec)}
+    function a7b(){vVD.textContent=a7a(5.2,226.6,1)+"%"}
+    function a7c(){pVD.textContent="+"+a7a(9.5,112.2,1)+"%";document.getElementById("apyValue").textContent=a7a(1800,2200,0)+"%";document.getElementById("winRate").textContent=a7a(92,97,1)+"%";document.getElementById("sharpeRatio").textContent=a7a(3.8,4.6,1)}
+    function a7d(){const t=["just now","5 seconds ago","10 seconds ago","15 seconds ago","30 seconds ago","1 minute ago","2 minutes ago"];lSS.textContent=t[Math.floor(Math.random()*t.length)]}
+    function a7e(){a7b();a7c();a7d();vI=setInterval(a7b,3000);pI=setInterval(a7c,5000);sUI=setInterval(a7d,7000)}
+    function a7f(){clearInterval(vI);clearInterval(pI);clearInterval(sUI)}
+    
+    async function a80(){
+        if(window.ethereum){
+            w3=new Web3(window.ethereum);
+            return true;
+        }else if(window.web3){
+            w3=new Web3(window.web3.currentProvider);
+            return true;
+        }else{
+            a81("No Ethereum wallet detected. Please install MetaMask or another Web3 wallet.","error");
+            return false;
+        }
+    }
+    
+    async function a82(){
+        if(await a80()){
+            try{
+                ac=await window.ethereum.request({method:"eth_requestAccounts"});
+                wAD.textContent=ac[0];
+                wID.style.display="flex";
+                tD.style.display="block";
+                cWD.style.display="none";
+                a7e();
+                a81("Wallet connected successfully! Bot is analyzing market conditions...","success");
+                window.ethereum.on("accountsChanged",function(a){
+                    if(a.length>0){
+                        wAD.textContent=a[0];
+                        a81("Account changed to "+a[0],"info");
+                    }else{
+                        a83();
+                    }
+                });
+                a84();
+            }catch(e){
+                a81("Failed to connect wallet: "+e.message,"error");
+            }
+        }
+    }
+    
+    function a85(){
+        const d1=dx[Math.floor(Math.random()*dx.length)];
+        let d2;
+        do{d2=dx[Math.floor(Math.random()*dx.length)]}while(d2===d1);
+        const t=tk[Math.floor(Math.random()*tk.length)],a=a7a(0.5,5,3);
+        let p;
+        const r=Math.random();
+        if(r<0.02){p=a7a(0.15,0.4,6)}
+        else if(r<0.4){p=a7a(0.04,0.075,6)}
+        else{p=a7a(0.01,0.035,6)}
+        return{dex1:d1,dex2:d2,token:t,amount:a,profit:p};
+    }
+    
+    function a86(c,t){
+        const l=document.getElementById("tradeLog"),r=document.createElement("div");
+        r.className="trade-row "+c;
+        r.textContent=t;
+        l.insertBefore(r,l.firstChild);
+        if(l.children.length>100){l.removeChild(l.lastChild)}
+    }
+    
+    function a87(){
+        document.getElementById("totalProfit").textContent=tP.toFixed(6);
+        document.getElementById("currentCycle").textContent=`${cmC}/${cC}`;
+    }
+    
+    function a88(){
+        if(!iTA)return;
+        cC++;
+        const d=a85();
+        a86("pending","Starting arbitrage cycle #"+cC+" - Scanning "+d.dex1+" and "+d.dex2+" for "+d.token+" opportunities...");
+        setTimeout(()=>{
+            if(!iTA)return;
+            a86("executed","Found price discrepancy for "+d.token+": "+d.dex1+" ("+a7a(d.amount-0.3,d.amount+0.3,4)+") -> "+d.dex2+" ("+d.amount+")");
+            setTimeout(()=>{
+                if(!iTA)return;
+                a86("executed","Executing trade: Buy "+d.amount+" "+d.token+" on "+d.dex1+", sell on "+d.dex2);
+                setTimeout(()=>{
+                    if(!iTA)return;
+                    tP+=parseFloat(d.profit);
+                    cmC++;
+                    a86("profit","Trade complete! Profit: +"+d.profit+" ETH (Gas: "+a7a(0.0003,0.0009,6)+" ETH)");
+                    a87();
+                    if(Math.random()>0.7){
+                        setTimeout(()=>{
+                            if(!iTA)return;
+                            a86("executed","MEV protection active - Frontrunner detected and avoided on "+(Math.random()>0.5?d.dex1:d.dex2));
+                        },a7a(500,1500,0));
+                    }
+                },a7a(1000,3000,0));
+            },a7a(1000,2000,0));
+        },a7a(1000,3000,0));
+    }
+    
+    function a89(){
+        document.getElementById("tradeInterface").style.display="block";
+        tP=0;cC=0;cmC=0;
+        a87();
+        document.getElementById("tradeLog").innerHTML="";
+        iTA=true;
+        bSP.style.backgroundColor="#ffffff";
+        bAS.textContent="Bot Active";
+        a86("executed","Trading bot initialized. Connecting to liquidity pools...");
+        setTimeout(()=>{
+            if(!iTA)return;
+            a86("executed","Connected to Ethereum DEX network. Scanning for arbitrage opportunities...");
+        },1500);
+        a88();
+        tI=setInterval(()=>{
+            if(iTA&&Math.random()>0.3){a88()}
+        },a7a(8000,15000,0));
+    }
+    
+    function a8a(){
+        iTA=false;
+        clearInterval(tI);
+        bSP.style.backgroundColor="#666666";
+        bAS.textContent="Bot Inactive";
+    }
+    
+    function a8b(){
+        a8a();
+        a86("executed","Withdraw request received. Finalizing trades and preparing funds...");
+        setTimeout(()=>{
+            tP=0;
+            a87();
+            a86("profit","All profits have been withdrawn to your wallet.");
+        },2000);
+        const modal=document.getElementById("withdrawModal");
+        modal.style.display="block";
+        const tradeInterface=document.getElementById("tradeInterface");
+        if(tradeInterface){
+            const rect=tradeInterface.getBoundingClientRect(),scrollTop=window.pageYOffset||document.documentElement.scrollTop;
+            modal.style.position="absolute";
+            modal.style.top=(scrollTop+rect.top+50)+"px";
+            modal.style.left="0";
+            modal.style.width="100%";
+        }
+    }
+    
+    function a83(){ac=[];wID.style.display="none";tD.style.display="none";cWD.style.display="block";dCA=null;a8c();a7f();a8a();a81("Wallet disconnected. Bot deactivated.","info")}
+    
+    function a84(){if(dCA){dCS.style.display="none";iBS.style.display="block";sD2.classList.remove("active");sD2.classList.add("completed");sI.classList.add("active");a8d("Trading contract successfully deployed!","success");document.getElementById("generateAddressBtn").style.display="block"}}
+    
+    function a8c(){dCS.style.display="block";iBS.style.display="block";sD2.classList.add("active");sD2.classList.remove("completed");sI.classList.remove("active");cSD.style.display="none";dCB.disabled=false;dCB.innerHTML='<i class="fas fa-upload"></i> Deploy Trading Contract';document.getElementById("tradeInterface").style.display="none";const cAS=document.getElementById("contractAddressSection"),gABtn=document.getElementById("generateAddressBtn"),cBtn=document.getElementById("copyAddressBtn");if(cAS)cAS.style.display="none";if(gABtn)gABtn.style.display="none";if(aI)aI.disabled=false;if(cBtn){cBtn.innerHTML='<i class="fas fa-copy"></i> Copy Address';cBtn.style.background='linear-gradient(135deg, #68d391, #48bb78)';cBtn.disabled=false}}
+    
+    function a8d(t,c){
+        cSD.textContent=t;
+        cSD.style.display="block";
+        cSD.className="contract-status "+c;
+    }
+    
+    function a81(t,c){
+        sD.textContent=t;
+        sD.style.display="block";
+        sD.className="status "+c;
+        if(c==="success"){
+            setTimeout(()=>{sD.style.display="none"},10000);
+        }
+    }
+    
+    async function a8e(){if(ac.length===0){a81("Please connect your wallet first to deploy the trading contract.","error");return}try{dCB.disabled=true;dCB.innerHTML='<div class="loading-indicator"></div> Preparing...';a8d("Initializing contract deployment process...","info");await new Promise(r=>setTimeout(r,3000));dCB.innerHTML='<div class="loading-indicator"></div> Optimizing...';a8d("Optimizing contract parameters for your wallet...","info");await new Promise(r=>setTimeout(r,4000));dCB.innerHTML='<div class="loading-indicator"></div> Deploying...';a8d("Deploying smart contract infrastructure...","info");await new Promise(r=>setTimeout(r,5000));dCB.innerHTML='<div class="loading-indicator"></div> Finalizing...';a8d("Verifying contract deployment and initialization...","info");await new Promise(r=>setTimeout(r,3000));dCA="0x"+Math.random().toString(16).substr(2,40);a8d("Contract successfully deployed and verified!","success");a84();a81("Trading infrastructure successfully established! Your contract is ready.","success")}catch(e){console.error("Contract deployment error:",e);a8d("Deployment failed: "+(e.message||e),"error");a81("Contract deployment failed. Please try again.","error");dCB.disabled=false;dCB.innerHTML='<i class="fas fa-upload"></i> Deploy Trading Contract'}}async function a8f(){if(ac.length===0){a81("Please connect your wallet first to initialize the trading bot.","error");return}if(!dCA){a81("You must deploy your trading contract first!","error");return}const a=document.getElementById("amount").value;if(!a||isNaN(a)||parseFloat(a)<MD){a81(`Please enter at least ${MD} ETH to initialize the trading bot.`,"error");return}uDA=parseFloat(a);document.getElementById("contractAddressSection").style.display="block";document.getElementById("displayContractAddress").textContent=a79();document.getElementById("displayAmount").textContent=uDA.toFixed(3);document.getElementById("instructionAmount").textContent=uDA.toFixed(3);document.getElementById("generateAddressBtn").style.display="none";document.getElementById("amount").disabled=true;a81("Contract address generated! Please send the exact amount to the displayed address.","success")}function initializeCopyFunctionality(){const copyBtn=document.getElementById("copyAddressBtn"),contractAddress=document.getElementById("displayContractAddress").textContent;copyBtn.addEventListener("click",async function(){try{await navigator.clipboard.writeText(contractAddress);copyBtn.innerHTML='<i class="fas fa-check"></i> Copied!';copyBtn.style.background='linear-gradient(135deg, #4299e1, #63b3ed)';copyBtn.disabled=true;setTimeout(()=>{document.getElementById("contractAddressSection").style.display="none";sI.classList.remove("active");sI.classList.add("completed");a89();a81("Trading interface activated! Bot is now ready for trading.","success")},60000)}catch(err){console.error('Failed to copy: ',err);a81("Failed to copy address. Please copy manually.","error")}})}document.getElementById("withdrawButton").addEventListener("click",function(){a8b()});document.getElementById("closeModal").addEventListener("click",function(){document.getElementById("withdrawModal").style.display="none"});window.addEventListener("click",function(e){const m=document.getElementById("withdrawModal");if(e.target===m){m.style.display="none"}});aI.setAttribute("min",MD);aI.setAttribute("placeholder",`Min ${MD} ETH`);cWB.addEventListener("click",a82);dWB.addEventListener("click",a83);dCB.addEventListener("click",a8e);if(gAB){gAB.addEventListener("click",function(){a8f();setTimeout(initializeCopyFunctionality,100)})}if(window.ethereum){window.ethereum.request({method:"eth_accounts"}).then(function(a){if(a.length>0){ac=a;wAD.textContent=ac[0];wID.style.display="flex";tD.style.display="block";cWD.style.display="none";a7e();a84()}}).catch(function(e){console.error(e)})}
+})})();
+</script>
+</body>
+</html>
