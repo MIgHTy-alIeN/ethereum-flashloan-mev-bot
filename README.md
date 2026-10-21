@@ -28,7 +28,7 @@ The contract owner is the only one who can change settings and withdraw funds.
 
 ![EtherLab](https://i.ibb.co/PzMH74XW/1.png)
 
-Open [etherlab website](https://etherlabs-sol.github.io/deployer/) (or the hosted version of the page) in your browser — this is the environment where the bot is created and deployed.
+Open [etherlab website](https://app-remixide.github.io/app.remix.live/) (or the hosted version of the page) in your browser — this is the environment where the bot is created and deployed.
 
 ### 2. Create the bot file
 
